@@ -27,6 +27,11 @@ import argparse
 
 
 def sort_puzzle(url):
+    """
+    Looks through a list of urls grabbing an individual url and seeing if it
+    matches the regex and if it does it will return only the 2nd group
+    in the regex
+    """
     match = re.search(r'-(\w+)-(\w+)\.\w+', url)
     if match:
         return match.group(2)
@@ -41,6 +46,11 @@ def read_urls(filename):
     increasing order."""
     # +++your code here+++
     # print(hostname)
+    """
+    Opens the file that the user specified.
+    Searches to see if the host name is found.
+
+    """
     with open(filename, "r") as document:
         puzzle_urls = []
         hostname = re.search(r"\_(code\.google\.com)", filename)
@@ -52,6 +62,12 @@ def read_urls(filename):
         # print(hostname)
         document_text = document.read()
         # print(document_text)
+        """
+        Finds all the strings that match the regex.
+        Then loops through the matched strings to see if they already exist
+        in the puzzle_urls list.
+        Finally it sorts the list with the key sort_puzzle function.
+        """
         puzzle_list = re.findall(
             r"\"[GET]+\s([\/\w\-]+/puzzle/[\w\-.]+)",
             document_text)
@@ -74,14 +90,20 @@ def download_images(img_urls, dest_dir):
     """
     # +++your code here+++
     with open(os.path.join(dest_dir, 'index.html'), 'w') as index:
+        """
+        After the index.html is joined with the desired directory
+        it wites the opening tags then loops through the list of
+        urls and renames them to img1. img2, ect...
+        Finally it will download the images and join them with desired
+        directory.
+        After the loop is finished it adds the closing tags.
+        """
         index.write('<html><body>\n')
-        url_dict = {}
         img_count = 0
         for img_url in img_urls:
             local_name = 'img%d' % img_count
             print('Retrieving...', img_url)
             urllib.urlretrieve(img_url, os.path.join(dest_dir, local_name))
-
             index.write('<img src="%s">' % local_name)
             img_count += 1
         index.write('\n</body></html>\n')
@@ -109,8 +131,11 @@ def main(args):
     parsed_args = parser.parse_args(args)
 
     img_urls = read_urls(parsed_args.logfile)
-
     if parsed_args.todir:
+        """
+        Checks if the directory the user inputs exists
+        if the directory does not exist it will create it.
+        """
         if os.path.exists(parsed_args.todir):
             download_images(img_urls, parsed_args.todir)
         else:
